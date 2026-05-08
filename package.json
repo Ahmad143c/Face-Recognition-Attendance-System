@@ -31,32 +31,6 @@
     "extends": [
       "react-app",
       "react-app/jest"
-    ],
-    "env": {
-      "production": {
-        "ESLINT_NO_DEV_ERRORS": "true"
-      }
-    }
-  },
-    "rules": {
-      "react-hooks/exhaustive-deps": "warn",
-      "no-use-before-define": "warn",
-      "no-unused-vars": "warn"
-    },
-    "overrides": [
-      {
-        "files": ["**/*.js", "**/*.jsx"],
-        "env": {
-          "CI": {
-            "es2020": true
-          }
-        },
-        "rules": {
-          "react-hooks/exhaustive-deps": "off",
-          "no-use-before-define": "off",
-          "no-unused-vars": "off"
-        }
-      }
     ]
   },
   "browserslist": {

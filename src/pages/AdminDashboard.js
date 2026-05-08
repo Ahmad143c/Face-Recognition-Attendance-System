@@ -26,6 +26,10 @@ const AdminDashboard = () => {
     dueDate: ''
   });
 
+  useEffect(() => {
+    loadData();
+  }, []);
+
   // Helper function to migrate old attendance logs
   const migrateAttendanceLogs = (logs) => {
     return logs.map(log => ({
@@ -36,7 +40,7 @@ const AdminDashboard = () => {
     }));
   };
 
-  const loadData = React.useCallback(() => {
+  const loadData = () => {
     try {
       setEmployees(JSON.parse(localStorage.getItem('emp_users') || '[]'));
       const attendanceData = JSON.parse(localStorage.getItem('attendance_logs') || '[]');
@@ -45,11 +49,7 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error('Error loading data:', error);
     }
-  }, []);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  };
 
   const getStats = () => {
     const today = new Date().toDateString();
@@ -845,6 +845,7 @@ const AdminDashboard = () => {
                 <BarChart data={() => {
                   const departments = ['Engineering', 'Marketing', 'HR', 'Finance', 'Operations', 'Design'];
                   return departments.map(dept => {
+                    const deptEmployees = employees.filter(emp => emp.department === dept);
                     const deptAttendanceLogs = attendanceLogs.filter(log => {
                       const emp = employees.find(e => e.id === log.employeeId);
                       return emp && emp.department === dept && log.workingHours;
