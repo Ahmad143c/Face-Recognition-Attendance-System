@@ -32,6 +32,12 @@
       "react-app",
       "react-app/jest"
     ],
+    "env": {
+      "production": {
+        "ESLINT_NO_DEV_ERRORS": "true"
+      }
+    }
+  },
     "rules": {
       "react-hooks/exhaustive-deps": "warn",
       "no-use-before-define": "warn",
