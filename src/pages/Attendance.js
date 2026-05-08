@@ -58,7 +58,7 @@ const Attendance = () => {
   };
 
   // Helper function to get today's session status
-  const getTodaySession = (employeeId) => {
+  const getTodaySession = React.useCallback((employeeId) => {
     const attendanceLogs = JSON.parse(localStorage.getItem('attendance_logs') || '[]');
     const migratedLogs = migrateAttendanceLogs(attendanceLogs);
     const todayDate = getCurrentDate();
@@ -66,37 +66,7 @@ const Attendance = () => {
     return migratedLogs.find(log => 
       log.employeeId === employeeId && log.date === todayDate
     );
-  };
-
-  const loadFaceApiModels = React.useCallback(async () => {
-    try {
-      addToast('Loading face recognition models...', 'info', 0);
-      await Promise.all([
-        faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model'),
-        faceapi.nets.faceLandmark68Net.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model'),
-        faceapi.nets.faceRecognitionNet.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model')
-      ]);
-      setModelsLoaded(true);
-      addToast('Models loaded successfully', 'success', 2000);
-      startVideo();
-    } catch (error) {
-      console.error('Error loading models:', error);
-      addToast('Failed to load face recognition models', 'error');
-    }
-  }, [addToast, startVideo]);
-
-  useEffect(() => {
-    loadFaceApiModels();
-    
-    return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-      }
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [loadFaceApiModels]);
+  }, []);
 
   const startVideo = React.useCallback(async () => {
     try {
@@ -115,9 +85,33 @@ const Attendance = () => {
       }
     } catch (error) {
       console.error('Error accessing camera:', error);
-      addToast('Failed to access camera. Please check permissions.', 'error');
+      addToast('Failed to access camera', 'error');
     }
   }, [addToast]);
+
+  const stopVideo = React.useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+    }
+    setIsScanning(false);
+  }, []);
+
+  const loadFaceApiModels = React.useCallback(async () => {
+    try {
+      addToast('Loading face recognition models...', 'info', 0);
+      await Promise.all([
+        faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model'),
+        faceapi.nets.faceLandmark68Net.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model'),
+        faceapi.nets.faceRecognitionNet.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model')
+      ]);
+      setModelsLoaded(true);
+      addToast('Models loaded successfully', 'success', 2000);
+      startVideo();
+    } catch (error) {
+      console.error('Error loading models:', error);
+      addToast('Failed to load face recognition models', 'error');
+    }
+  }, [addToast, startVideo]);
 
   const startScanning = React.useCallback(() => {
     setIsScanning(true);
