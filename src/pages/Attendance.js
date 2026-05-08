@@ -83,7 +83,7 @@ const Attendance = () => {
       console.error('Error loading models:', error);
       addToast('Failed to load face recognition models', 'error');
     }
-  }, [addToast]);
+  }, [addToast, startVideo]);
 
   useEffect(() => {
     loadFaceApiModels();
@@ -244,7 +244,7 @@ const Attendance = () => {
       console.error('Error marking attendance:', error);
       addToast('Failed to mark attendance', 'error');
     }
-  }, [addToast, login, navigate]);
+  }, [addToast, login, navigate, getTodaySession]);
 
   const recognizeFace = React.useCallback(async () => {
     if (!modelsLoaded || !isVideoReady || !isScanning || !videoRef.current || !canvasRef.current) return;

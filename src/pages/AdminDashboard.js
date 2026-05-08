@@ -28,7 +28,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   // Helper function to migrate old attendance logs
   const migrateAttendanceLogs = (logs) => {
@@ -845,7 +845,6 @@ const AdminDashboard = () => {
                 <BarChart data={() => {
                   const departments = ['Engineering', 'Marketing', 'HR', 'Finance', 'Operations', 'Design'];
                   return departments.map(dept => {
-                    const deptEmployees = employees.filter(emp => emp.department === dept);
                     const deptAttendanceLogs = attendanceLogs.filter(log => {
                       const emp = employees.find(e => e.id === log.employeeId);
                       return emp && emp.department === dept && log.workingHours;
