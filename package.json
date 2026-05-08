@@ -41,7 +41,9 @@
       {
         "files": ["**/*.js", "**/*.jsx"],
         "env": {
-          "CI": true
+          "CI": {
+            "es2020": true
+          }
         },
         "rules": {
           "react-hooks/exhaustive-deps": "off",
