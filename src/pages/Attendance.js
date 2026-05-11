@@ -132,6 +132,30 @@ const Attendance = () => {
     }
   }, []);
 
+  const formatTime = (timeString) => {
+    if (!timeString) return '—';
+    
+    // Check if it's already in HH:MM:SS format
+    if (timeString.includes(':') && timeString.split(':').length === 3) {
+      const [hours, minutes] = timeString.split(':');
+      const hour = parseInt(hours);
+      const minute = parseInt(minutes);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const displayHour = hour % 12 || 12;
+      return `${displayHour}:${minute.toString().padStart(2, '0')} ${ampm}`;
+    }
+    
+    // Fallback for old date-time strings
+    try {
+      return new Date(timeString).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      return '—';
+    }
+  };
+
   const markAttendance = React.useCallback(async (employee) => {
     try {
       const attendanceLogs = JSON.parse(localStorage.getItem('attendance_logs') || '[]');
@@ -365,244 +389,250 @@ const Attendance = () => {
   };
 
   return (
-    <div className="min-h-screen py-12 px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-4xl mx-auto"
-      >
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gradient mb-4">Mark Attendance</h1>
-          <p className="text-gray-400">Use face recognition or manual login to mark your attendance</p>
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Face Recognition Section */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="glass-card p-6"
-          >
-            <h2 className="text-xl font-bold mb-4 text-gradient">Face Recognition</h2>
-            
-            {!modelsLoaded && (
-              <div className="text-center py-8">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-cyan"></div>
-                <p className="mt-4 text-gray-400">Loading face recognition models...</p>
+    <div className="min-h-screen bg-charcoal mobile-full-height">
+      {/* Header */}
+      <div className="mobile-header safe-area-top">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-cyan to-amber rounded-full flex items-center justify-center">
+                <span className="text-black font-bold text-lg">F</span>
               </div>
-            )}
+              <h1 className="text-xl sm:text-2xl font-bold text-gradient">FACEMARK</h1>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Link to="/dashboard" className="btn-secondary-sm">
+                <span className="hidden sm:inline">Dashboard</span>
+                <span className="sm:hidden">🏠</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            {modelsLoaded && (
-              <div className="space-y-4">
-                {/* Camera UI Status Pill */}
-                <div className="flex justify-center mb-4">
-                  <div className={`px-4 py-2 rounded-full text-sm font-medium border ${
-                    currentSession === 'checked-in' 
-                      ? 'bg-amber-500/20 text-amber-400 border-amber-500/50'
-                      : currentSession === 'complete'
-                      ? 'bg-gray-500/20 text-gray-400 border-gray-500/50'
-                      : 'bg-cyan/20 text-cyan border-cyan/50'
-                  }`}>
-                    {currentSession === 'checked-in' ? 'READY TO CHECK OUT' : 
-                     currentSession === 'complete' ? 'SESSION COMPLETE' : 
-                     'READY TO CHECK IN'}
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-6 sm:py-8">
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-8 items-start">
+          {/* Left Column - Camera and Controls */}
+          <div className="order-2 lg:order-1">
+            <div className="glass-card p-4 sm:p-6">
+              <div className="text-center mb-4 sm:mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-gradient mb-2">Mark Attendance</h2>
+                <p className="text-gray-400 text-sm sm:text-base">Use face recognition to check in or out</p>
+              </div>
+
+              {/* Camera Status Pill */}
+              <div className="flex justify-center mb-4 sm:mb-6">
+                <div className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium border ${
+                  currentSession === 'checked-in' 
+                    ? 'bg-amber-500/20 text-amber-400 border-amber-500/50'
+                    : currentSession === 'complete'
+                    ? 'bg-gray-500/20 text-gray-400 border-gray-500/50'
+                    : 'bg-cyan/20 text-cyan border-cyan/50'
+                }`}>
+                  {currentSession === 'checked-in' ? 'READY TO CHECK OUT' : 
+                   currentSession === 'complete' ? 'SESSION COMPLETE' : 
+                   'READY TO CHECK IN'}
+                </div>
+              </div>
+
+              {/* Camera Container */}
+              <div className="mobile-camera-container mb-4 sm:mb-6">
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover rounded-lg border border-gray-700"
+                />
+                <canvas
+                  ref={canvasRef}
+                  className="absolute top-0 left-0 w-full h-full rounded-lg"
+                />
+
+                {/* Mobile camera overlay */}
+                <div className="mobile-camera-overlay">
+                  <div className="absolute inset-0 border-2 border-cyan/30 rounded-lg pointer-events-none">
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 sm:w-40 sm:h-40 border-2 border-cyan rounded-full opacity-50"></div>
                   </div>
                 </div>
-                
-                <div className="relative inline-block">
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    muted
-                    width="640"
-                    height="480"
-                    className="w-full rounded-lg border border-gray-700"
-                  />
-                  <canvas
-                    ref={canvasRef}
-                    width="640"
-                    height="480"
-                    className="absolute top-0 left-0 w-full rounded-lg"
-                  />
-                </div>
+              </div>
 
+              {/* Control Buttons */}
+              <div className="space-y-3 sm:space-y-4">
                 <div className="flex justify-center">
                   {!isScanning ? (
-                    <button onClick={startScanning} className="btn-primary">
-                      Start Face Scan
+                    <button onClick={startScanning} className="btn-primary w-full sm:w-auto">
+                      <span className="hidden sm:inline">Start Face Scan</span>
+                      <span className="sm:hidden">Start Scan</span>
                     </button>
                   ) : (
-                    <button onClick={stopScanning} className="btn-danger">
-                      Stop Scanning
+                    <button onClick={stopScanning} className="btn-danger w-full sm:w-auto">
+                      <span className="hidden sm:inline">Stop Scanning</span>
+                      <span className="sm:hidden">Stop</span>
                     </button>
                   )}
                 </div>
 
+                {/* Scanning Status */}
                 {isScanning && (
                   <div className="text-center">
                     <div className="inline-block animate-pulse">
                       <div className="w-3 h-3 bg-cyan rounded-full"></div>
                     </div>
-                    <p className="text-cyan mt-2">Scanning for face...</p>
+                    <p className="text-cyan mt-2 text-xs sm:text-sm">Scanning for face...</p>
+                    <p className="text-gray-400 text-xs mt-1">Position your face in the frame</p>
                   </div>
                 )}
 
-                {matchedEmployee && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="glass-card p-4 border border-cyan/50"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 bg-gradient-to-br from-cyan to-amber rounded-full flex items-center justify-center">
-                        <span className="text-black font-bold">
-                          {matchedEmployee.name.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="font-bold">{matchedEmployee.name}</p>
-                        <p className="text-sm text-gray-400">{matchedEmployee.department}</p>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
+                {/* Manual Login Option */}
+                <div className="text-center">
+                  <Link to="/login" className="text-cyan hover:text-cyan/80 text-xs sm:text-sm transition-colors">
+                    Or login manually
+                  </Link>
+                </div>
+              </div>
+            </div>
 
+            {/* Mobile Instructions */}
+            <div className="lg:hidden mt-4">
+              <div className="mobile-card">
+                <h3 className="font-bold text-cyan mb-2">Quick Tips</h3>
+                <ul className="text-xs text-gray-400 space-y-1">
+                  <li>• Ensure good lighting</li>
+                  <li>• Position face in the circle</li>
+                  <li>• Keep camera steady</li>
+                  <li>• Remove glasses if needed</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column - Status and Info */}
+          <div className="order-1 lg:order-2">
+            <div className="glass-card p-4 sm:p-6">
+              <h3 className="text-lg sm:text-xl font-bold text-gradient mb-4">Attendance Status</h3>
+
+              {/* Status Display */}
+              <div className="space-y-4">
                 {attendanceStatus && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={`glass-card p-4 border ${
-                      attendanceStatus.type === 'checkin' 
-                        ? 'border-green-500/50 bg-green-500/10' 
-                        : attendanceStatus.type === 'checkout'
-                        ? 'border-blue-500/50 bg-blue-500/10'
-                        : attendanceStatus.type === 'complete'
-                        ? 'border-amber-500/50 bg-amber-500/10'
+                    className={`p-3 sm:p-4 rounded-lg border ${
+                      attendanceStatus.type === 'success' 
+                        ? 'bg-green-500/20 border-green-500/50'
                         : attendanceStatus.type === 'error'
-                        ? 'border-red-500/50 bg-red-500/10'
-                        : 'border-gray-500/50 bg-gray-500/10'
+                        ? 'bg-red-500/20 border-red-500/50'
+                        : 'bg-amber-500/20 border-amber-500/50'
                     }`}
                   >
-                    <div className="flex items-center space-x-2">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        {attendanceStatus.type === 'checkin' ? (
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        ) : attendanceStatus.type === 'checkout' ? (
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        ) : attendanceStatus.type === 'complete' ? (
-                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                        ) : attendanceStatus.type === 'error' ? (
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                        ) : (
-                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                        )}
-                      </svg>
-                      <div className="flex-1">
-                        <p className={`font-medium ${
-                          attendanceStatus.type === 'checkin' ? 'text-green-400' 
-                          : attendanceStatus.type === 'checkout'
-                          ? 'text-blue-400'
-                          : attendanceStatus.type === 'complete'
-                          ? 'text-amber-400'
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center ${
+                        attendanceStatus.type === 'success' 
+                          ? 'bg-green-500'
                           : attendanceStatus.type === 'error'
-                          ? 'text-red-400'
-                          : 'text-gray-400'
-                        }`}>
-                          {attendanceStatus.message}
-                        </p>
-                        {(attendanceStatus.type === 'checkin' || attendanceStatus.type === 'checkout') && (
-                          <p className="text-sm text-gray-400 mt-1 flex items-center">
-                            <svg className="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            Automatically logging in and redirecting to dashboard...
-                          </p>
+                          ? 'bg-red-500'
+                          : 'bg-amber-500'
+                      }`}>
+                        {attendanceStatus.type === 'success' && (
+                          <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
                         )}
+                        {attendanceStatus.type === 'error' && (
+                          <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                        {attendanceStatus.type === 'warning' && (
+                          <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-bold text-sm sm:text-base">{attendanceStatus.title}</p>
+                        <p className="text-xs sm:text-sm text-gray-300">{attendanceStatus.message}</p>
                       </div>
                     </div>
                   </motion.div>
                 )}
 
-                {!isScanning && !matchedEmployee && (
-                  <p className="text-gray-400 text-sm text-center">
-                    Click "Start Face Scan" to begin face recognition
-                  </p>
+                {/* Today's Session Info */}
+                {currentSession && currentSession !== 'none' && (
+                  <div className="mobile-card">
+                    <h4 className="font-bold text-cyan mb-2">Today's Session</h4>
+                    <div className="space-y-1 text-xs sm:text-sm">
+                      {currentSession.checkInTime && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Check In:</span>
+                          <span className="text-white">{formatTime(currentSession.checkInTime)}</span>
+                        </div>
+                      )}
+                      {currentSession.checkOutTime && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Check Out:</span>
+                          <span className="text-white">{formatTime(currentSession.checkOutTime)}</span>
+                        </div>
+                      )}
+                      {currentSession.workingHours && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Hours:</span>
+                          <span className="text-white">{currentSession.workingHours}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 )}
-              </div>
-            )}
-          </motion.div>
 
-          {/* Manual Login Section */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-            className="glass-card p-6"
-          >
-            <h2 className="text-xl font-bold mb-4 text-gradient">Manual Login</h2>
-            
-            <form onSubmit={handleManualLogin} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={loginForm.email}
-                  onChange={handleLoginInputChange}
-                  className={`input-field ${loginErrors.email ? 'border-red-500' : ''}`}
-                  placeholder="Enter your email"
-                />
-                {loginErrors.email && <p className="text-red-400 text-sm mt-1">{loginErrors.email}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
-                <input
-                  type="password"
-                  name="password"
-                  value={loginForm.password}
-                  onChange={handleLoginInputChange}
-                  className={`input-field ${loginErrors.password ? 'border-red-500' : ''}`}
-                  placeholder="Enter your password"
-                />
-                {loginErrors.password && <p className="text-red-400 text-sm mt-1">{loginErrors.password}</p>}
-              </div>
-
-              {loginErrors.general && (
-                <div className="glass-card p-3 border border-red-500/50">
-                  <p className="text-red-400 text-sm">{loginErrors.general}</p>
+                {/* Instructions */}
+                <div className="hidden lg:block">
+                  <h4 className="font-bold text-cyan mb-2">Instructions</h4>
+                  <ul className="text-sm text-gray-400 space-y-1">
+                    <li>• Ensure good lighting</li>
+                    <li>• Position face in the circle</li>
+                    <li>• Keep camera steady</li>
+                    <li>• Remove glasses if needed</li>
+                    <li>• Wait for recognition</li>
+                  </ul>
                 </div>
-              )}
-
-              <button type="submit" className="w-full btn-primary">
-                Login
-              </button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <p className="text-gray-400 text-sm">
-                Don't have an account?{' '}
-                <Link to="/register" className="text-cyan hover:text-cyan/80 transition-colors">
-                  Register here
-                </Link>
-              </p>
-            </div>
-
-            <div className="mt-6 p-4 glass-card border border-gray-700">
-              <h3 className="font-bold mb-2 text-amber">Admin Access</h3>
-              <p className="text-sm text-gray-400 mb-2">
-                For admin dashboard, use:
-              </p>
-              <div className="text-xs bg-charcoal-light p-2 rounded">
-                <p>Email: admin@company.com</p>
-                <p>Password: Admin@123</p>
               </div>
             </div>
-          </motion.div>
+
+            {/* System Status */}
+            <div className="glass-card p-4 sm:p-6 mt-4 sm:mt-6">
+              <h3 className="text-lg sm:text-xl font-bold text-gradient mb-4">System Status</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-400">Face Recognition:</span>
+                  <span className={`text-xs px-2 py-1 rounded-full ${
+                    modelsLoaded ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                  }`}>
+                    {modelsLoaded ? 'Active' : 'Loading...'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-400">Camera:</span>
+                  <span className={`text-xs px-2 py-1 rounded-full ${
+                    isVideoReady ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                  }`}>
+                    {isVideoReady ? 'Ready' : 'Not Ready'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-400">Scanning:</span>
+                  <span className={`text-xs px-2 py-1 rounded-full ${
+                    isScanning ? 'bg-amber-500/20 text-amber-400' : 'bg-gray-500/20 text-gray-400'
+                  }`}>
+                    {isScanning ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

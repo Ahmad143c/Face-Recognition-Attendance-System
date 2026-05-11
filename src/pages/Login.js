@@ -272,22 +272,22 @@ const Login = () => {
   }, [isScanning, modelsLoaded, isVideoReady, recognizeFace]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen flex items-center justify-center py-8 sm:py-12 px-4 mobile-full-height">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
-        <div className="glass-card p-8">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-cyan to-amber rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-black font-bold text-2xl">F</span>
+        <div className="glass-card p-6 sm:p-8">
+          <div className="text-center mb-6 sm:mb-8">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-cyan to-amber rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+              <span className="text-black font-bold text-xl sm:text-2xl">F</span>
             </div>
-            <h1 className="text-3xl font-bold text-gradient mb-2">Welcome Back</h1>
-            <p className="text-gray-400">Login to your FACEMARK account</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gradient mb-2">Welcome Back</h1>
+            <p className="text-gray-400 text-sm sm:text-base">Login to your FACEMARK account</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {errors.general && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -307,9 +307,10 @@ const Login = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className={`input-field ${errors.email ? 'border-red-500' : ''}`}
+                className={`input-field ${errors.email ? 'border-red-500' : ''} text-base sm:text-lg`}
                 placeholder="Enter your email"
                 disabled={isLoading}
+                autoComplete="email"
               />
               {errors.email && (
                 <p className="text-red-400 text-sm mt-1">{errors.email}</p>
@@ -325,9 +326,10 @@ const Login = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className={`input-field ${errors.password ? 'border-red-500' : ''}`}
+                className={`input-field ${errors.password ? 'border-red-500' : ''} text-base sm:text-lg`}
                 placeholder="Enter your password"
                 disabled={isLoading}
+                autoComplete="current-password"
               />
               {errors.password && (
                 <p className="text-red-400 text-sm mt-1">{errors.password}</p>
@@ -337,7 +339,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full btn-primary flex items-center justify-center"
+              className="w-full btn-primary flex items-center justify-center py-3 sm:py-4 text-base sm:text-lg"
             >
               {isLoading ? (
                 <>
@@ -352,56 +354,63 @@ const Login = () => {
 
           {/* Face Recognition Section */}
           {!showFaceRecognition ? (
-            <div className="mt-6">
+            <div className="mt-4 sm:mt-6">
               <button
                 onClick={() => setShowFaceRecognition(true)}
-                className="w-full btn-secondary flex items-center justify-center"
+                className="w-full btn-secondary flex items-center justify-center py-3 sm:py-4 text-base sm:text-lg"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                 </svg>
-                Login with Face Recognition
+                <span className="hidden sm:inline">Login with Face Recognition</span>
+                <span className="sm:hidden">Face Login</span>
               </button>
             </div>
           ) : (
-            <div className="mt-6 space-y-4">
-              <div className="glass-card p-4 border border-cyan/50">
-                <h3 className="text-lg font-bold text-gradient mb-4">Face Recognition Login</h3>
+            <div className="mt-4 sm:mt-6 space-y-3 sm:space-y-4">
+              <div className="glass-card p-3 sm:p-4 border border-cyan/50">
+                <h3 className="text-base sm:text-lg font-bold text-gradient mb-3 sm:mb-4">Face Recognition Login</h3>
                 
                 {!modelsLoaded && (
-                  <div className="text-center py-4">
-                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-cyan"></div>
-                    <p className="mt-2 text-gray-400 text-sm">Loading face recognition models...</p>
+                  <div className="text-center py-3 sm:py-4">
+                    <div className="inline-block animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-cyan"></div>
+                    <p className="mt-2 text-gray-400 text-xs sm:text-sm">Loading face recognition models...</p>
                   </div>
                 )}
 
                 {modelsLoaded && (
-                  <div className="space-y-4">
-                    <div className="relative inline-block w-full">
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="mobile-camera-container">
                       <video
                         ref={videoRef}
                         autoPlay
                         muted
-                        width="320"
-                        height="240"
-                        className="w-full rounded-lg border border-gray-700"
+                        playsInline
+                        className="w-full h-full object-cover rounded-lg border border-gray-700"
                       />
                       <canvas
                         ref={canvasRef}
-                        width="320"
-                        height="240"
-                        className="absolute top-0 left-0 w-full rounded-lg"
+                        className="absolute top-0 left-0 w-full h-full rounded-lg"
                       />
+                      
+                      {/* Mobile camera overlay */}
+                      <div className="mobile-camera-overlay">
+                        <div className="absolute inset-0 border-2 border-cyan/30 rounded-lg pointer-events-none">
+                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 sm:w-32 sm:h-32 border-2 border-cyan rounded-full opacity-50"></div>
+                        </div>
+                      </div>
                     </div>
 
                     <div className="flex justify-center">
                       {!isScanning ? (
-                        <button onClick={startScanning} className="btn-primary">
-                          Start Face Scan
+                        <button onClick={startScanning} className="btn-primary w-full sm:w-auto">
+                          <span className="hidden sm:inline">Start Face Scan</span>
+                          <span className="sm:hidden">Start Scan</span>
                         </button>
                       ) : (
-                        <button onClick={stopScanning} className="btn-danger">
-                          Stop Scanning
+                        <button onClick={stopScanning} className="btn-danger w-full sm:w-auto">
+                          <span className="hidden sm:inline">Stop Scanning</span>
+                          <span className="sm:hidden">Stop</span>
                         </button>
                       )}
                     </div>
@@ -411,7 +420,8 @@ const Login = () => {
                         <div className="inline-block animate-pulse">
                           <div className="w-3 h-3 bg-cyan rounded-full"></div>
                         </div>
-                        <p className="text-cyan mt-2 text-sm">Scanning for face...</p>
+                        <p className="text-cyan mt-2 text-xs sm:text-sm">Scanning for face...</p>
+                        <p className="text-gray-400 text-xs mt-1">Position your face in the frame</p>
                       </div>
                     )}
 
@@ -422,8 +432,8 @@ const Login = () => {
                         className="glass-card p-3 border border-green-500/50"
                       >
                         <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-cyan to-amber rounded-full flex items-center justify-center">
-                            <span className="text-black font-bold text-sm">
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-cyan to-amber rounded-full flex items-center justify-center">
+                            <span className="text-black font-bold text-xs sm:text-sm">
                               {matchedUser.name.charAt(0).toUpperCase()}
                             </span>
                           </div>
@@ -444,45 +454,45 @@ const Login = () => {
 
                     {!isScanning && !matchedUser && (
                       <p className="text-gray-400 text-xs text-center">
-                        Position your face in the frame and click "Start Face Scan"
+                        <span className="hidden sm:inline">Position your face in the frame and click "Start Face Scan"</span>
+                        <span className="sm:hidden">Position face in frame & tap scan</span>
                       </p>
                     )}
                   </div>
                 )}
               </div>
-
+              
+              {/* Mobile close button */}
               <button
-                onClick={() => {
-                  setShowFaceRecognition(false);
-                  stopScanning();
-                }}
-                className="w-full text-gray-400 hover:text-gray-300 text-sm transition-colors"
+                onClick={() => setShowFaceRecognition(false)}
+                className="w-full btn-secondary-sm text-center"
               >
-                Back to Manual Login
+                Cancel
               </button>
             </div>
           )}
 
-          <div className="mt-6 space-y-4">
-            <div className="text-center">
-              <p className="text-gray-400 text-sm">
-                Don't have an account?{' '}
-                <Link to="/register" className="text-cyan hover:text-cyan/80 transition-colors">
-                  Register here
-                </Link>
-              </p>
-            </div>
-
-            <div className="text-center">
-              <Link 
-                to="/attendance" 
-                className="text-cyan hover:text-cyan/80 text-sm transition-colors"
-              >
-                Mark Attendance with Face Recognition
+          {/* Register Link */}
+          <div className="mt-6 text-center">
+            <p className="text-gray-400 text-sm">
+              Don't have an account?{' '}
+              <Link to="/register" className="text-cyan hover:text-cyan/80 font-medium">
+                Register here
               </Link>
-            </div>
+            </p>
           </div>
 
+          {/* Quick Links */}
+          <div className="mt-4 text-center">
+            <Link 
+              to="/attendance" 
+              className="text-cyan hover:text-cyan/80 text-sm transition-colors"
+            >
+              Mark Attendance with Face Recognition
+            </Link>
+          </div>
+
+          {/* Demo Credentials */}
           <div className="mt-6 p-4 glass-card border border-gray-700">
             <h3 className="font-bold mb-2 text-amber text-sm">Demo Credentials</h3>
             <div className="text-xs space-y-1">

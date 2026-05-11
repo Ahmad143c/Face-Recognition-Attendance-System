@@ -10,6 +10,19 @@
   body {
     @apply bg-charcoal text-white font-sans;
   }
+  
+  /* Mobile-specific base styles */
+  @media (max-width: 640px) {
+    html {
+      font-size: 14px;
+    }
+  }
+  
+  @media (max-width: 475px) {
+    html {
+      font-size: 13px;
+    }
+  }
 }
 
 @layer components {
@@ -41,8 +54,20 @@
     @apply bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200;
   }
   
+  .btn-primary-sm {
+    @apply bg-cyan hover:bg-cyan/90 text-black font-bold py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 text-sm;
+  }
+  
+  .btn-secondary-sm {
+    @apply bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 text-sm;
+  }
+  
   .input-field {
     @apply w-full px-4 py-3 bg-charcoal-light border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan focus:ring-2 focus:ring-cyan focus:ring-opacity-20 transition-all duration-200;
+  }
+  
+  .input-field-sm {
+    @apply w-full px-3 py-2 bg-charcoal-light border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan focus:ring-2 focus:ring-cyan focus:ring-opacity-20 transition-all duration-200 text-sm;
   }
   
   .priority-high {
@@ -80,6 +105,31 @@
     color: #4ade80;
     border-color: rgba(34, 197, 94, 0.5);
   }
+  
+  /* Mobile-specific components */
+  .mobile-container {
+    @apply px-4 py-6 max-w-md mx-auto;
+  }
+  
+  .mobile-card {
+    @apply glass-card p-4 mb-4;
+  }
+  
+  .mobile-header {
+    @apply sticky top-0 z-50 bg-charcoal/95 backdrop-blur-md border-b border-gray-800;
+  }
+  
+  .mobile-nav {
+    @apply fixed bottom-0 left-0 right-0 bg-charcoal/95 backdrop-blur-md border-t border-gray-800 z-50;
+  }
+  
+  .mobile-camera-container {
+    @apply relative w-full aspect-video bg-charcoal-light rounded-lg overflow-hidden;
+  }
+  
+  .mobile-camera-overlay {
+    @apply absolute inset-0 pointer-events-none;
+  }
 }
 
 @layer utilities {
@@ -111,5 +161,43 @@
   
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     background-color: #4b5563;
+  }
+  
+  /* Mobile-specific utilities */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .safe-area-left {
+    padding-left: env(safe-area-inset-left);
+  }
+  
+  .safe-area-right {
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  .mobile-full-height {
+    height: 100vh;
+    height: 100dvh; /* dynamic viewport height for mobile */
+  }
+  
+  .mobile-scroll {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+  }
+  
+  .mobile-no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  .mobile-tap-highlight {
+    -webkit-tap-highlight-color: transparent;
   }
 }

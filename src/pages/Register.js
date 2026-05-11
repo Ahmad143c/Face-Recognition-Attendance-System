@@ -786,15 +786,15 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen flex items-center justify-center py-8 sm:py-12 px-4 mobile-full-height">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-2xl"
       >
-        <div className="glass-card p-8">
+        <div className="glass-card p-6 sm:p-8">
           {/* Progress Steps with Progress Bar */}
-          <div className="relative mb-12">
+          <div className="relative mb-8 sm:mb-12">
             {/* Progress bar background */}
             <div className="absolute top-7 left-3 right-0 h-1 bg-gray-700 rounded-full">
               {/* Filled progress for completed steps only */}
@@ -810,15 +810,15 @@ const Register = () => {
             
             <div className="relative flex items-center justify-between">
               {[1, 2, 3].map((step, index) => {
-                const stepTitles = ['Personal Info', 'Face Scan', 'Account'];
+                const stepTitles = ['Personal', 'Face', 'Account'];
                 const stepIcons = [
-                  <svg key="icon1" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg key="icon1" className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>,
-                  <svg key="icon2" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg key="icon2" className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>,
-                  <svg key="icon3" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg key="icon3" className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                 ];
@@ -836,7 +836,7 @@ const Register = () => {
                       {/* Glow effect for active/completed steps */}
                       {(isActive || isCompleted) && (
                         <motion.div
-                          className={`absolute inset-0 w-14 h-14 rounded-full blur-xl ${
+                          className={`absolute inset-0 w-10 h-10 sm:w-14 sm:h-14 rounded-full blur-xl ${
                             isCompleted ? 'bg-green-500/40' : 'bg-cyan/40'
                           }`}
                           animate={{
@@ -853,7 +853,7 @@ const Register = () => {
                       
                       {/* Main step circle */}
                       <motion.div
-                        className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-lg border-2 relative z-10 ${
+                        className={`w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center font-bold text-sm sm:text-lg border-2 relative z-10 ${
                           isCompleted
                             ? 'bg-gradient-to-br from-green-500 to-emerald-500 text-white border-green-400 shadow-lg shadow-green-500/25'
                             : isActive
@@ -910,23 +910,19 @@ const Register = () => {
                       }}
                       transition={{ delay: 0.2 }}
                     >
-                      <h3 className={`font-bold text-sm mb-1 ${
+                      <h3 className={`font-bold text-xs sm:text-sm mb-1 ${
                         isCompleted
                           ? 'text-green-400'
                           : isActive
                           ? 'text-cyan'
                           : 'text-gray-500'
                       }`}>
-                        Step {step}
-                      </h3>
-                      <p className={`text-xs font-medium ${
-                        isCompleted
-                          ? 'text-green-300'
-                          : isActive
-                          ? 'text-gray-300'
-                          : 'text-gray-600'
-                      }`}>
                         {stepTitles[index]}
+                      </h3>
+                      <p className="text-xs text-gray-400 hidden sm:block">
+                        {step === 1 && 'Personal Information'}
+                        {step === 2 && 'Face Registration'}
+                        {step === 3 && 'Account Credentials'}
                       </p>
                     </motion.div>
                   </div>
