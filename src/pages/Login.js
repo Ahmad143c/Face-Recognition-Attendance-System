@@ -390,10 +390,12 @@ const Login = () => {
                         muted
                         playsInline
                         className="w-full h-full object-cover rounded-lg border border-gray-700"
+                        style={{ transform: 'scaleX(-1)' }}
                       />
                       <canvas
                         ref={canvasRef}
                         className="absolute top-0 left-0 w-full h-full rounded-lg"
+                        style={{ transform: 'scaleX(-1)' }}
                       />
                       
                       {/* Mobile camera overlay */}
