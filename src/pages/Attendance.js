@@ -10,11 +10,8 @@ const Attendance = () => {
   const [modelsLoaded, setModelsLoaded] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
-  const [matchedEmployee, setMatchedEmployee] = useState(null);
   const [attendanceStatus, setAttendanceStatus] = useState(null);
   const [currentSession, setCurrentSession] = useState(null);
-  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
-  const [loginErrors, setLoginErrors] = useState({});
   
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -70,15 +67,18 @@ const Attendance = () => {
 
   const startVideo = React.useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { width: 640, height: 480 } 
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'user',
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        }
       });
-      
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
-        
-        // Wait for video metadata to load before setting as ready
+
         videoRef.current.onloadedmetadata = () => {
           setIsVideoReady(true);
         };
@@ -121,7 +121,6 @@ const Attendance = () => {
 
   const startScanning = React.useCallback(() => {
     setIsScanning(true);
-    setMatchedEmployee(null);
     setAttendanceStatus(null);
   }, []);
 
@@ -315,7 +314,6 @@ const Attendance = () => {
           if (match.label !== 'unknown') {
             const employee = employees.find(emp => emp.id === match.label);
             if (employee) {
-              setMatchedEmployee(employee);
               await markAttendance(employee);
               stopScanning();
             }
@@ -347,46 +345,6 @@ const Attendance = () => {
       }
     };
   }, [isScanning, modelsLoaded, isVideoReady, recognizeFace]);
-
-  const handleManualLogin = (e) => {
-    e.preventDefault();
-    const errors = {};
-    
-    if (!loginForm.email.trim()) errors.email = 'Email is required';
-    if (!loginForm.password) errors.password = 'Password is required';
-    
-    if (Object.keys(errors).length > 0) {
-      setLoginErrors(errors);
-      return;
-    }
-
-    const employees = JSON.parse(localStorage.getItem('emp_users') || '[]');
-    const user = employees.find(emp => 
-      emp.email === loginForm.email && emp.password === loginForm.password
-    );
-
-    if (user) {
-      login({ 
-        userId: user.id, 
-        role: user.role, 
-        name: user.name, 
-        email: user.email 
-      });
-      addToast('Login successful!', 'success');
-      navigate('/dashboard');
-    } else {
-      setLoginErrors({ general: 'Invalid email or password' });
-      addToast('Invalid credentials', 'error');
-    }
-  };
-
-  const handleLoginInputChange = (e) => {
-    const { name, value } = e.target;
-    setLoginForm(prev => ({ ...prev, [name]: value }));
-    if (loginErrors[name]) {
-      setLoginErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
 
   return (
     <div className="min-h-screen bg-charcoal mobile-full-height">
@@ -443,11 +401,11 @@ const Attendance = () => {
                   autoPlay
                   muted
                   playsInline
-                  className="w-full h-full object-cover rounded-lg border border-gray-700"
+                  className="camera-video w-full h-full object-cover rounded-xl border-2 border-gray-700 shadow-2xl"
                 />
                 <canvas
                   ref={canvasRef}
-                  className="absolute top-0 left-0 w-full h-full rounded-lg"
+                  className="camera-canvas absolute inset-0 w-full h-full rounded-xl"
                 />
 
                 {/* Mobile camera overlay */}

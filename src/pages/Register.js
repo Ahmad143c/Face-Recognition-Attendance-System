@@ -32,15 +32,18 @@ const Register = () => {
 
   const startVideo = React.useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { width: 640, height: 480 } 
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'user',
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        }
       });
-      
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
-        
-        // Wait for video metadata to load before setting as ready
+
         videoRef.current.onloadedmetadata = () => {
           setIsVideoReady(true);
         };
@@ -464,15 +467,16 @@ const Register = () => {
                       ref={videoRef}
                       autoPlay
                       muted
+                      playsInline
                       width="640"
                       height="480"
-                      className="rounded-xl border-2 border-gray-700 shadow-2xl"
+                      className="camera-video rounded-xl border-2 border-gray-700 shadow-2xl"
                     />
                     <canvas
                       ref={canvasRef}
                       width="640"
                       height="480"
-                      className="absolute top-0 left-0 rounded-xl"
+                      className="camera-canvas absolute top-0 left-0 rounded-xl"
                     />
                     
                     {/* Face detection overlay */}

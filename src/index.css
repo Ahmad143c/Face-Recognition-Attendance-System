@@ -130,6 +130,12 @@
   .mobile-camera-overlay {
     @apply absolute inset-0 pointer-events-none;
   }
+
+  .camera-video,
+  .camera-canvas {
+    transform: scaleX(-1);
+    transform-origin: center;
+  }
 }
 
 @layer utilities {
